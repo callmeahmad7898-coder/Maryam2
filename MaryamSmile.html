@@ -1,0 +1,191 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Maryam — A Little Smile</title>
+  <style>
+    :root{--bg:#0b1020;--card:#0f1724;--accent:#ff6b9f}
+    html,body{height:100%;margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,"Noto Nastaliq Urdu",sans-serif;background:linear-gradient(160deg,#071028 0%, #0b1020 60%);color:#e6eef8}
+    .wrap{min-height:100%;display:flex;align-items:center;justify-content:center;padding:30px}
+    .card{width:100%;max-width:760px;background:linear-gradient(180deg, rgba(255,255,255,0.03), rgba(255,255,255,0.01));box-shadow:0 8px 30px rgba(2,6,23,0.7);border-radius:18px;padding:28px;position:relative;overflow:hidden}
+    h1{margin:0 0 8px 0;font-size:26px;text-align:center}
+    p.subtitle{margin:0 0 18px 0;text-align:center;opacity:0.8}
+    .quoteBox{min-height:140px;display:flex;align-items:center;justify-content:center;text-align:center;padding:18px;font-size:20px;line-height:1.4}
+    .quote{max-width:680px}
+    .controls{display:flex;gap:10px;justify-content:center;margin-top:18px}
+    button{background:var(--accent);border:none;padding:10px 16px;border-radius:12px;color:white;font-weight:600;cursor:pointer;box-shadow:0 6px 18px rgba(255,90,140,0.12)}
+    button.secondary{background:transparent;border:1px solid rgba(255,255,255,0.06)}
+    .small{font-size:13px;opacity:0.9}
+    .hearts{position:absolute;inset:0;pointer-events:none}
+    .heart{position:absolute;font-size:24px;opacity:0.06;transform:rotate(-20deg)}
+    .cursor{display:inline-block;width:8px;background:#fff;margin-left:6px;animation:blink 1s steps(2,end) infinite}
+    @keyframes blink{50%{opacity:0}}
+    canvas.confetti{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}
+  </style>
+</head>
+<body>
+  <div class="wrap">
+    <div class="card" id="card">
+      <canvas class="confetti" id="conf" width="1200" height="800"></canvas>
+      <div class="hearts" id="hearts"></div>
+      <h1>For Maryam — Just a Little Smile 😊</h1>
+      <p class="subtitle small">Press "Start" — every click shows a new sweet or funny line. Made with smiles — from Ahmad 💖</p>
+      <div class="quoteBox">
+        <div class="quote" id="quote">Hello Maryam — this page is made just for you!<span class="cursor" id="cursor"></span></div>
+      </div>
+      <div class="controls">
+        <button id="start">Start</button>
+        <button id="next" class="secondary">Next 😊</button>
+        <button id="surprise" class="secondary">Surprise me 🎁</button>
+      </div>
+      <p class="small" style="text-align:center;margin-top:18px;opacity:0.8">
+        And now... just click on “Surprise me 🎁”
+      </p>
+      <p class="small" style="text-align:center;margin-top:6px;opacity:0.8">From Ahmad 💫</p>
+    </div>
+  </div>
+
+  <script>
+    // Quotes
+    const quotes = [
+      'Maryam, tu meri sabse achi dost hai — aur ye page sirf tere liye bana! 💫',
+      'Mera din shuru bhi tumse hota hai... aur muskurahat bhi tumpe khatam hoti hai 💖',
+      'Teri friendship mere din ka best update hoti hai ❤️',
+      'Kabhi socha nahi tha dost bhi itni caring ho sakti hai — like you, Maryam!',
+      'Maryam, tu sirf friend nahi — ek positive vibe hai 💕',
+      'Best friend wo hoti hai jo bina reason hasaa de... tu bilkul waisi hai 😄',
+      'Tum muskara do to lagta hai duniya slow motion mein chal rahi hai 💕',
+      'Kuch log kehte hain smile se din bright hota hai — main kehta hoon Maryam se! 🌸',
+      'Tere bina har quote adhura lagta hai 😅',
+      'Ek dost hoti hai jo har mood mein smile la deti hai — wo tu hai Maryam 😍'
+    ];
+
+    // Surprise message (emotional + warm)
+    const specialMessage = 'Your best friend Ahmad says: “Keep smiling 😊 and whenever you need — you’ll always find me with you.” 💖';
+
+    const qEl = document.getElementById('quote');
+    const cursor = document.getElementById('cursor');
+    const startBtn = document.getElementById('start');
+    const nextBtn = document.getElementById('next');
+    const surpriseBtn = document.getElementById('surprise');
+
+    let currentIndex = 0;
+    let typing = false;
+
+    function typeText(text, cb){
+      typing = true;
+      qEl.innerHTML = '';
+      let i=0;
+      cursor.style.display='inline-block';
+      function step(){
+        if(i<text.length){
+          qEl.innerHTML += text.charAt(i);
+          i++;
+          setTimeout(step, 50 + Math.random()*60);
+        } else {
+          cursor.style.display='none';
+          typing = false;
+          if(cb) cb();
+        }
+      }
+      step();
+    }
+
+    function showQuote(idx){
+      const text = quotes[idx % quotes.length];
+      typeText(text);
+      popHearts(6);
+      burstConfetti();
+    }
+
+    startBtn.addEventListener('click', ()=>{
+      currentIndex = 0;
+      showQuote(currentIndex);
+    });
+
+    nextBtn.addEventListener('click', ()=>{
+      if(typing) return;
+      currentIndex = (currentIndex+1) % quotes.length;
+      showQuote(currentIndex);
+    });
+
+    surpriseBtn.addEventListener('click', ()=>{
+      if(typing) return;
+      typeText(specialMessage);
+      popHearts(12);
+      burstConfetti();
+    });
+
+    // Hearts
+    const heartsContainer = document.getElementById('hearts');
+    function popHearts(n){
+      for(let i=0;i<n;i++){
+        const h = document.createElement('div');
+        h.className='heart';
+        h.style.left = (10 + Math.random()*80) + '%';
+        h.style.top = (10 + Math.random()*80) + '%';
+        h.style.fontSize = (14 + Math.random()*36) + 'px';
+        h.style.opacity = (0.03 + Math.random()*0.12);
+        h.innerText = '❤';
+        heartsContainer.appendChild(h);
+        (function(el){
+          setTimeout(()=>{el.style.transform='translateY(-40px) rotate(-10deg)';el.style.opacity='0'}, 100);
+          setTimeout(()=>{el.remove();}, 2200);
+        })(h);
+      }
+    }
+
+    // Confetti
+    const confCanvas = document.getElementById('conf');
+    const ctx = confCanvas.getContext('2d');
+    let confettiPieces = [];
+    function rand(min,max){return Math.random()*(max-min)+min}
+    function createConfetti(){
+      const w = confCanvas.width = confCanvas.clientWidth || 1200;
+      const h = confCanvas.height = confCanvas.clientHeight || 800;
+      confettiPieces = [];
+      for(let i=0;i<60;i++){
+        confettiPieces.push({x:rand(0,w),y:rand(-h,0),r:rand(4,9),d:rand(10,40),tilt:rand(-10,10),speed:rand(1,4)})
+      }
+    }
+    function drawConfetti(){
+      ctx.clearRect(0,0,confCanvas.width,confCanvas.height);
+      for(let p of confettiPieces){
+        ctx.save();
+        ctx.translate(p.x,p.y);
+        ctx.rotate(p.tilt * Math.PI/180);
+        ctx.fillRect(-p.r/2, -p.r/2, p.r, p.r*1.5);
+        ctx.restore();
+      }
+    }
+    function updateConfetti(){
+      for(let p of confettiPieces){
+        p.y += p.speed + Math.sin(p.d) * 0.4;
+        p.x += Math.sin(p.d);
+        p.tilt += 0.5;
+        if(p.y > confCanvas.height + 20) { p.y = rand(-100, -10); p.x = rand(0, confCanvas.width); }
+      }
+    }
+    let confettiAnim;
+    function burstConfetti(){
+      createConfetti();
+      let t=0;
+      cancelAnimationFrame(confettiAnim);
+      function frame(){
+        drawConfetti();
+        updateConfetti();
+        t++; if(t<180) confettiAnim = requestAnimationFrame(frame);
+        else ctx.clearRect(0,0,confCanvas.width,confCanvas.height);
+      }
+      frame();
+    }
+
+    window.addEventListener('load', ()=>{
+      setTimeout(()=>{typeText('Hello Maryam — this message is from Ahmad 💌 Press Start :)');},400);
+    });
+
+    window.addEventListener('resize', ()=>{confCanvas.width = confCanvas.clientWidth; confCanvas.height = confCanvas.clientHeight;});
+  </script>
+</body>
+</html>
